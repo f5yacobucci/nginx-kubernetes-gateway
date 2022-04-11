@@ -56,11 +56,16 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-20.04
+    needs: vars
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
+      - name: Setup Golang Environment
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ needs.vars.outputs.go_version }}
       - name: Lint Code
-        uses: golangci/golangci-lint-action@v2
+        uses: golangci/golangci-lint-action@v3.1.0
         with:
           args: --timeout ${{ env.GOLANGCI_TIMEOUT }}
 
@@ -72,13 +77,13 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
       - name: Setup Golang Environment
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
           go-version: ${{ needs.vars.outputs.go_version }}
       - name: Run Tests
         run: make unit-test
       - name: Upload Coverage Report
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: cover-${{ needs.vars.outputs.sha }}.html
           path: ${{ github.workspace }}/cover.html
@@ -92,7 +97,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
       - name: Setup Golang Environment
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
           go-version: ${{ needs.vars.outputs.go_version }}
       - name: Build Binary
@@ -146,7 +151,7 @@ jobs:
         with:
           sarif_file: 'trivy-results-nginx-kubernetes-gateway.sarif'
       - name: Upload Scan Results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         continue-on-error: true
         with:
           name: 'trivy-results-nginx-kubernetes-gateway.sarif'
